@@ -14,7 +14,6 @@ type OnBoardUserResponse =
       error: string;
     };
 
-
 export const onBoardUser = async (): Promise<OnBoardUserResponse> => {
   try {
     const user = await currentUser();
