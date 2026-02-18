@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
-import { User } from "@prisma/client";
+import { User, UserRole } from "@prisma/client";
 
 type OnBoardUserResponse =
   | {
@@ -54,5 +54,30 @@ export const onBoardUser = async (): Promise<OnBoardUserResponse> => {
       success: false,
       error: "Failed to onboard user",
     };
+  }
+};
+
+export const currentUserRole = async (): Promise<UserRole | undefined> => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      return undefined;
+    }
+
+    const { id } = user;
+    const userRole = await db.user.findUnique({
+      where: {
+        clerkId: id,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    return userRole?.role;
+  } catch (error: unknown) {
+    console.log("Error getting currentUserRole", error);
+    return undefined;
   }
 };
